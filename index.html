@@ -1,0 +1,1224 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes, viewport-fit=cover">
+    <title>Tabla de Verdad · Funciones Lógicas</title>
+    <style>
+        :root {
+            --bg: #1a1a2e;
+            --surface: #16213e;
+            --surface2: #0f3460;
+            --accent: #e94560;
+            --accent2: #533483;
+            --text: #e0e0e0;
+            --text-secondary: #b0b0b0;
+            --border: #2a2a4a;
+            --cell-0: #1c1c3a;
+            --cell-1: #2d1f3d;
+            --header-bg: #0d1b36;
+            --hex-bg: #1a2740;
+            --hover: #3a3a5c;
+            --toggle-bg: #2a2a4a;
+            --toggle-active: #e94560;
+            --shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
+            --radius: clamp(6px, 1.5vw, 10px);
+            --radius-sm: clamp(4px, 1vw, 6px);
+            --transition: 0.2s ease;
+            --expr-bg: #101b30;
+            --expr-border: #2a3a5a;
+            --gold: #ffb347;
+            --green: #5fdf8f;
+            --blue: #7eb8ff;
+            --purple: #c792ea;
+            --font-xs: clamp(0.65rem, 1.4vw, 0.78rem);
+            --font-sm: clamp(0.72rem, 1.5vw, 0.85rem);
+            --font-md: clamp(0.8rem, 1.7vw, 0.95rem);
+            --font-lg: clamp(0.9rem, 2vw, 1.1rem);
+            --font-xl: clamp(1.1rem, 2.5vw, 1.4rem);
+            --touch-target: clamp(36px, 8vw, 44px);
+            --cell-min: clamp(38px, 7vw, 52px);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            -webkit-tap-highlight-color: transparent;
+            -webkit-text-size-adjust: 100%;
+            text-size-adjust: 100%;
+        }
+
+        body {
+            font-family: 'Segoe UI', 'Inter', system-ui, -apple-system, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            min-height: 100dvh;
+            display: flex;
+            justify-content: center;
+            padding: clamp(8px, 2vw, 20px);
+            background-image:
+                radial-gradient(ellipse at 20% 20%, rgba(233, 68, 96, 0.06) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 80%, rgba(83, 52, 131, 0.08) 0%, transparent 50%),
+                radial-gradient(ellipse at 50% 0%, rgba(100, 150, 255, 0.04) 0%, transparent 40%);
+            overflow-x: hidden;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1300px;
+            display: flex;
+            flex-direction: column;
+            gap: clamp(10px, 2vw, 20px);
+        }
+
+        /* ── Header ─────────────────────── */
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: clamp(8px, 1.5vw, 16px);
+            background: var(--surface);
+            border-radius: var(--radius);
+            padding: clamp(10px, 2vw, 18px) clamp(12px, 2.5vw, 24px);
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow);
+        }
+        .header .title-section {
+            display: flex;
+            align-items: center;
+            gap: clamp(6px, 1.5vw, 12px);
+            flex-shrink: 0;
+        }
+        .header .logo {
+            width: clamp(30px, 6vw, 42px);
+            height: clamp(30px, 6vw, 42px);
+            border-radius: var(--radius-sm);
+            background: linear-gradient(135deg, var(--accent), var(--accent2));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: clamp(16px, 3.5vw, 20px);
+            font-weight: bold;
+            color: #fff;
+            flex-shrink: 0;
+        }
+        .header h1 {
+            font-size: var(--font-xl);
+            font-weight: 700;
+            letter-spacing: -0.3px;
+            color: #fff;
+            white-space: nowrap;
+        }
+        .header .subtitle {
+            font-size: var(--font-xs);
+            color: var(--text-secondary);
+            font-weight: 400;
+            display: block;
+        }
+
+        /* ── Controls ──────────────────── */
+        .controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: clamp(5px, 1vw, 10px);
+            align-items: center;
+        }
+        .control-group {
+            display: flex;
+            align-items: center;
+            gap: clamp(4px, 1vw, 7px);
+            background: var(--surface2);
+            padding: clamp(5px, 1vw, 8px) clamp(8px, 1.5vw, 14px);
+            border-radius: 20px;
+            border: 1px solid var(--border);
+            transition: var(--transition);
+            min-height: var(--touch-target);
+        }
+        .control-group label {
+            font-size: var(--font-xs);
+            font-weight: 500;
+            color: var(--text-secondary);
+            white-space: nowrap;
+            letter-spacing: 0.2px;
+        }
+        .control-group select {
+            background: var(--bg);
+            color: #fff;
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: clamp(4px, 0.8vw, 6px) clamp(8px, 1.5vw, 12px);
+            font-size: var(--font-xs);
+            font-weight: 500;
+            cursor: pointer;
+            outline: none;
+            transition: var(--transition);
+            appearance: none;
+            -webkit-appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M6 8L1 3h10z' fill='%23b0b0b0'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 8px center;
+            padding-right: clamp(24px, 5vw, 30px);
+            min-width: clamp(50px, 10vw, 70px);
+            min-height: clamp(28px, 5vw, 34px);
+        }
+        .control-group select:hover {
+            border-color: var(--accent);
+        }
+        .control-group select:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 2px rgba(233, 68, 96, 0.2);
+        }
+
+        /* ── Toggle switch ─────────────── */
+        .toggle-wrapper {
+            display: flex;
+            align-items: center;
+            gap: clamp(4px, 1vw, 8px);
+            cursor: pointer;
+            user-select: none;
+            -webkit-user-select: none;
+            min-height: var(--touch-target);
+            padding: clamp(4px, 1vw, 6px) clamp(6px, 1vw, 10px);
+            border-radius: 20px;
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            transition: var(--transition);
+            white-space: nowrap;
+        }
+        .toggle-wrapper input {
+            display: none;
+        }
+        .toggle-track {
+            width: clamp(34px, 6vw, 40px);
+            height: clamp(18px, 3.5vw, 22px);
+            border-radius: 11px;
+            background: var(--toggle-bg);
+            border: 1.5px solid var(--border);
+            position: relative;
+            transition: var(--transition);
+            flex-shrink: 0;
+        }
+        .toggle-track::after {
+            content: '';
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: clamp(11px, 2vw, 14px);
+            height: clamp(11px, 2vw, 14px);
+            border-radius: 50%;
+            background: #888;
+            transition: var(--transition);
+        }
+        .toggle-wrapper input:checked+.toggle-track {
+            background: var(--toggle-active);
+            border-color: var(--toggle-active);
+        }
+        .toggle-wrapper input:checked+.toggle-track::after {
+            left: calc(100% - clamp(13px, 2.5vw, 16px));
+            background: #fff;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+        }
+        .toggle-label {
+            font-size: var(--font-xs);
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        /* ── Table container ───────────── */
+        .table-container {
+            background: var(--surface);
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+            overflow-x: auto;
+            box-shadow: var(--shadow);
+            -webkit-overflow-scrolling: touch;
+            scroll-behavior: smooth;
+            position: relative;
+        }
+        .table-container::after {
+            content: '';
+            position: sticky;
+            right: 0;
+            top: 0;
+            bottom: 0;
+            width: 20px;
+            background: linear-gradient(to right, transparent, rgba(22, 33, 62, 0.9));
+            pointer-events: none;
+            z-index: 3;
+            opacity: 0.7;
+        }
+        .table-wrapper {
+            min-width: max-content;
+            padding: 2px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            min-width: max-content;
+            font-size: var(--font-sm);
+        }
+
+        thead th {
+            background: var(--header-bg);
+            padding: clamp(5px, 1vw, 10px) clamp(4px, 0.8vw, 8px);
+            text-align: center;
+            font-weight: 600;
+            font-size: var(--font-xs);
+            color: #c0c8e0;
+            letter-spacing: 0.3px;
+            border-bottom: 2px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 2;
+            white-space: nowrap;
+            min-width: var(--cell-min);
+        }
+        thead th.row-num-header {
+            min-width: clamp(30px, 5vw, 42px);
+            width: clamp(30px, 5vw, 42px);
+            color: var(--text-secondary);
+            font-weight: 500;
+            font-size: var(--font-xs);
+        }
+        thead th.var-col {
+            color: var(--blue);
+            font-weight: 700;
+            font-size: var(--font-sm);
+            min-width: clamp(32px, 5.5vw, 48px);
+            width: clamp(32px, 5.5vw, 48px);
+        }
+        thead th.func-col {
+            min-width: clamp(50px, 9vw, 70px);
+            padding: clamp(3px, 0.6vw, 6px) clamp(2px, 0.4vw, 4px);
+        }
+        thead th.func-col input {
+            width: 100%;
+            max-width: clamp(45px, 9vw, 80px);
+            background: transparent;
+            border: 1px solid transparent;
+            color: var(--gold);
+            font-weight: 700;
+            font-size: var(--font-xs);
+            text-align: center;
+            padding: clamp(3px, 0.6vw, 4px) 2px;
+            border-radius: 4px;
+            transition: var(--transition);
+            letter-spacing: 0.3px;
+            outline: none;
+            min-height: clamp(24px, 4.5vw, 30px);
+        }
+        thead th.func-col input:hover {
+            border-color: rgba(255, 179, 71, 0.4);
+            background: rgba(255, 179, 71, 0.06);
+        }
+        thead th.func-col input:focus {
+            border-color: var(--gold);
+            background: rgba(255, 179, 71, 0.1);
+            box-shadow: 0 0 0 3px rgba(255, 179, 71, 0.1);
+        }
+        thead th.hex-col-header {
+            color: var(--green);
+            font-weight: 700;
+            font-size: var(--font-xs);
+            min-width: clamp(55px, 10vw, 80px);
+            letter-spacing: 0.5px;
+        }
+
+        tbody td {
+            padding: clamp(4px, 0.8vw, 6px) clamp(4px, 0.8vw, 8px);
+            text-align: center;
+            font-size: var(--font-xs);
+            border-bottom: 1px solid rgba(42, 42, 74, 0.5);
+            transition: background var(--transition);
+            font-variant-numeric: tabular-nums;
+            font-family: 'SF Mono', 'Cascadia Code', 'Consolas', 'Monaco', monospace;
+            font-weight: 500;
+            letter-spacing: 0.2px;
+            min-height: clamp(28px, 5vw, 36px);
+        }
+        tbody td.row-num {
+            color: #555;
+            font-weight: 400;
+            font-size: var(--font-xs);
+            background: rgba(0, 0, 0, 0.2);
+            min-width: clamp(30px, 5vw, 42px);
+            width: clamp(30px, 5vw, 42px);
+        }
+        tbody td.var-cell {
+            color: #a0c4f0;
+            font-weight: 600;
+            font-size: var(--font-sm);
+            background: rgba(13, 27, 54, 0.35);
+            min-width: clamp(32px, 5.5vw, 48px);
+        }
+        tbody td.func-cell {
+            cursor: pointer;
+            user-select: none;
+            -webkit-user-select: none;
+            font-weight: 700;
+            font-size: var(--font-sm);
+            transition: all 0.15s ease;
+            position: relative;
+            min-width: var(--cell-min);
+            min-height: clamp(28px, 5vw, 36px);
+        }
+        tbody td.func-cell.val-0 {
+            color: #666;
+            background: var(--cell-0);
+        }
+        tbody td.func-cell.val-1 {
+            color: #ff6b8a;
+            background: var(--cell-1);
+            text-shadow: 0 0 8px rgba(233, 68, 96, 0.4);
+        }
+        tbody td.func-cell:active {
+            transform: scale(0.93);
+            transition: transform 0.05s ease;
+        }
+        tbody td.hex-cell {
+            color: var(--green);
+            font-weight: 600;
+            font-size: var(--font-xs);
+            background: var(--hex-bg);
+            letter-spacing: 0.4px;
+            min-width: clamp(55px, 10vw, 80px);
+        }
+
+        tfoot td {
+            font-weight: 700 !important;
+            font-size: var(--font-xs) !important;
+            letter-spacing: 0.5px !important;
+            padding: clamp(5px, 1vw, 8px) clamp(4px, 0.8vw, 8px);
+        }
+        tfoot td.summary-label {
+            color: #888;
+            font-weight: 600;
+            background: var(--header-bg);
+            font-family: 'Segoe UI', 'Inter', system-ui, sans-serif;
+            font-size: var(--font-xs) !important;
+        }
+        tfoot td.summary-var {
+            color: var(--blue);
+            background: #0d1f3a;
+        }
+        tfoot td.summary-func {
+            color: var(--gold);
+            background: #1a1a30;
+            font-family: 'SF Mono', 'Cascadia Code', 'Consolas', 'Monaco', monospace !important;
+        }
+        tfoot td.summary-hex {
+            color: var(--green);
+            background: #0f2838;
+            font-family: 'SF Mono', 'Cascadia Code', 'Consolas', 'Monaco', monospace !important;
+        }
+        tfoot tr {
+            border-top: 2px solid var(--accent);
+        }
+
+        /* ── Expressions / Accordion ───── */
+        .expressions-container {
+            background: var(--surface);
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+            padding: clamp(10px, 2vw, 20px) clamp(12px, 2.5vw, 24px);
+            box-shadow: var(--shadow);
+            display: flex;
+            flex-direction: column;
+            gap: clamp(8px, 1.5vw, 14px);
+        }
+        .expr-section-header {
+            display: flex;
+            align-items: center;
+            gap: clamp(6px, 1.5vw, 10px);
+            cursor: pointer;
+            user-select: none;
+            -webkit-user-select: none;
+            padding: clamp(4px, 1vw, 8px) 0;
+            transition: var(--transition);
+            min-height: var(--touch-target);
+            -webkit-tap-highlight-color: transparent;
+        }
+        .expr-section-header:active {
+            opacity: 0.7;
+        }
+        .expr-title {
+            font-size: var(--font-lg);
+            font-weight: 700;
+            color: #ddd;
+            letter-spacing: -0.2px;
+            display: flex;
+            align-items: center;
+            gap: clamp(4px, 1vw, 8px);
+            transition: color var(--transition);
+        }
+        .expr-title::before {
+            content: '📐';
+            font-size: clamp(1rem, 2.5vw, 1.1rem);
+        }
+        .accordion-arrow {
+            font-size: clamp(0.7rem, 1.6vw, 0.9rem);
+            color: var(--text-secondary);
+            transition: transform 0.25s ease;
+            display: inline-block;
+            width: clamp(14px, 3vw, 18px);
+            text-align: center;
+            flex-shrink: 0;
+        }
+        .accordion-arrow.collapsed {
+            transform: rotate(-90deg);
+        }
+        .expr-content {
+            display: flex;
+            flex-direction: column;
+            gap: clamp(8px, 1.5vw, 12px);
+            transition: all 0.3s ease;
+        }
+        .expr-content.hidden {
+            display: none;
+        }
+
+        .expr-card {
+            background: var(--expr-bg);
+            border: 1px solid var(--expr-border);
+            border-radius: var(--radius-sm);
+            transition: var(--transition);
+            overflow: hidden;
+        }
+        .expr-card .func-header {
+            display: flex;
+            align-items: center;
+            gap: clamp(4px, 1vw, 8px);
+            padding: clamp(10px, 1.8vw, 12px) clamp(12px, 2vw, 18px);
+            cursor: pointer;
+            user-select: none;
+            -webkit-user-select: none;
+            transition: background var(--transition);
+            min-height: var(--touch-target);
+            -webkit-tap-highlight-color: transparent;
+        }
+        .expr-card .func-header:active {
+            background: rgba(255, 255, 255, 0.03);
+        }
+        .expr-card .func-name {
+            font-weight: 700;
+            color: var(--gold);
+            font-size: var(--font-md);
+            letter-spacing: 0.2px;
+        }
+        .expr-card .func-arrow {
+            font-size: clamp(0.65rem, 1.4vw, 0.8rem);
+            color: var(--text-secondary);
+            transition: transform 0.25s ease;
+            margin-left: auto;
+            width: clamp(14px, 3vw, 18px);
+            text-align: center;
+            flex-shrink: 0;
+        }
+        .expr-card .func-arrow.collapsed {
+            transform: rotate(-90deg);
+        }
+        .expr-card .func-body {
+            padding: 0 clamp(12px, 2vw, 18px) clamp(10px, 1.8vw, 14px) clamp(12px, 2vw, 18px);
+            display: flex;
+            flex-direction: column;
+            gap: clamp(4px, 0.8vw, 6px);
+            transition: all 0.3s ease;
+        }
+        .expr-card .func-body.hidden {
+            display: none;
+        }
+        .expr-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: clamp(4px, 0.8vw, 10px);
+            align-items: baseline;
+        }
+        .expr-row .label {
+            font-weight: 600;
+            font-size: var(--font-xs);
+            color: var(--text-secondary);
+            min-width: clamp(80px, 16vw, 110px);
+            letter-spacing: 0.3px;
+            text-transform: uppercase;
+            flex-shrink: 0;
+        }
+        .expr-row .value {
+            font-family: 'SF Mono', 'Cascadia Code', 'Consolas', 'Monaco', monospace;
+            font-size: var(--font-xs);
+            color: #e0e0e0;
+            word-break: break-all;
+            background: rgba(0, 0, 0, 0.25);
+            padding: clamp(3px, 0.6vw, 4px) clamp(6px, 1.2vw, 10px);
+            border-radius: 4px;
+            letter-spacing: 0.3px;
+            line-height: 1.5;
+            flex: 1;
+            min-width: 0;
+        }
+        .expr-row .value.canonical {
+            color: #c0c8ff;
+        }
+        .expr-row .value.canonical-pos {
+            color: var(--purple);
+        }
+        .expr-row .value.simplified {
+            color: var(--green);
+            font-weight: 600;
+        }
+
+        /* ── Media Queries específicas ─── */
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 8px;
+                padding: 10px 12px;
+            }
+            .header .title-section {
+                justify-content: center;
+            }
+            .controls {
+                justify-content: center;
+                gap: 6px;
+            }
+            .control-group {
+                padding: 5px 8px;
+                gap: 4px;
+                border-radius: 16px;
+            }
+            .control-group select {
+                font-size: 0.7rem;
+                padding: 4px 6px;
+                padding-right: 22px;
+                background-position: right 5px center;
+                background-size: 10px;
+                min-width: 44px;
+            }
+            .toggle-wrapper {
+                padding: 4px 8px;
+                border-radius: 16px;
+                gap: 4px;
+            }
+            .toggle-label {
+                font-size: 0.68rem;
+            }
+            .table-container::after {
+                width: 12px;
+            }
+            thead th {
+                padding: 5px 4px;
+                font-size: 0.65rem;
+            }
+            tbody td {
+                padding: 4px 5px;
+                font-size: 0.7rem;
+            }
+            thead th.func-col input {
+                max-width: 48px;
+                font-size: 0.65rem;
+                padding: 3px 1px;
+            }
+            .expr-row {
+                flex-direction: column;
+                gap: 3px;
+            }
+            .expr-row .label {
+                min-width: auto;
+                font-size: 0.65rem;
+            }
+            .expr-row .value {
+                font-size: 0.68rem;
+                padding: 3px 6px;
+            }
+            .expr-card .func-header {
+                padding: 8px 12px;
+            }
+            .expr-card .func-name {
+                font-size: 0.8rem;
+            }
+            .expressions-container {
+                padding: 10px 12px;
+                gap: 8px;
+            }
+            .expr-section-header {
+                padding: 6px 0;
+            }
+            .expr-title {
+                font-size: 0.9rem;
+            }
+        }
+
+        @media (max-width: 400px) {
+            body {
+                padding: 4px;
+            }
+            .container {
+                gap: 8px;
+            }
+            .header {
+                padding: 8px 10px;
+                gap: 6px;
+            }
+            .header h1 {
+                font-size: 1rem;
+            }
+            .controls {
+                gap: 4px;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            .control-group {
+                padding: 4px 6px;
+                border-radius: 14px;
+                gap: 3px;
+            }
+            .control-group label {
+                font-size: 0.6rem;
+            }
+            .control-group select {
+                font-size: 0.6rem;
+                padding: 3px 5px;
+                padding-right: 18px;
+                background-size: 8px;
+                min-width: 36px;
+            }
+            .toggle-wrapper {
+                padding: 3px 6px;
+                border-radius: 14px;
+                gap: 3px;
+            }
+            .toggle-track {
+                width: 28px;
+                height: 16px;
+                border-radius: 8px;
+            }
+            .toggle-track::after {
+                width: 10px;
+                height: 10px;
+                top: 2px;
+                left: 2px;
+            }
+            .toggle-wrapper input:checked+.toggle-track::after {
+                left: calc(100% - 12px);
+            }
+            .toggle-label {
+                font-size: 0.6rem;
+            }
+            thead th {
+                padding: 4px 3px;
+                font-size: 0.6rem;
+                min-width: 30px;
+            }
+            tbody td {
+                padding: 3px 4px;
+                font-size: 0.65rem;
+                min-height: 24px;
+            }
+            thead th.func-col input {
+                max-width: 38px;
+                font-size: 0.6rem;
+                min-height: 20px;
+            }
+            .expr-row .label {
+                font-size: 0.6rem;
+            }
+            .expr-row .value {
+                font-size: 0.62rem;
+            }
+            .expr-card .func-name {
+                font-size: 0.72rem;
+            }
+        }
+
+        /* ── Scrollbar styling ─────────── */
+        .table-container::-webkit-scrollbar {
+            height: clamp(4px, 1vw, 6px);
+        }
+        .table-container::-webkit-scrollbar-track {
+            background: var(--surface);
+            border-radius: 3px;
+        }
+        .table-container::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 3px;
+        }
+        .table-container::-webkit-scrollbar-thumb:hover {
+            background: #4a4a6a;
+        }
+
+        /* ── Focus visible ────────────── */
+        *:focus-visible {
+            outline: 2px solid var(--accent);
+            outline-offset: 2px;
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="title-section">
+                <div class="logo">⊿</div>
+                <div>
+                    <h1>Tabla de Verdad</h1>
+                    <span class="subtitle">Funciones lógicas · simplificación</span>
+                </div>
+            </div>
+            <div class="controls">
+                <div class="control-group">
+                    <label for="numVars">Var:</label>
+                    <select id="numVars" aria-label="Número de variables">
+                        <option value="2">2</option>
+                        <option value="3" selected>3</option>
+                        <option value="4">4</option>
+                    </select>
+                </div>
+                <div class="control-group">
+                    <label for="numFuncs">Func:</label>
+                    <select id="numFuncs" aria-label="Número de funciones">
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4" selected>4</option>
+                        <option value="5">5</option>
+                        <option value="6">6</option>
+                        <option value="7">7</option>
+                        <option value="8">8</option>
+                    </select>
+                </div>
+                <label class="toggle-wrapper" title="Columna HEX">
+                    <input type="checkbox" id="showHexCol" checked>
+                    <span class="toggle-track"></span>
+                    <span class="toggle-label">HEX</span>
+                </label>
+                <label class="toggle-wrapper" title="Fila resumen">
+                    <input type="checkbox" id="showSummaryRow" checked>
+                    <span class="toggle-track"></span>
+                    <span class="toggle-label">Resumen</span>
+                </label>
+                <label class="toggle-wrapper" title="Expresiones">
+                    <input type="checkbox" id="showExpressions" checked>
+                    <span class="toggle-track"></span>
+                    <span class="toggle-label">Expr</span>
+                </label>
+            </div>
+        </div>
+
+        <!-- Table -->
+        <div class="table-container" id="tableContainer">
+            <div class="table-wrapper">
+                <table id="truthTable">
+                    <thead id="tableHead"></thead>
+                    <tbody id="tableBody"></tbody>
+                    <tfoot id="tableFoot"></tfoot>
+                </table>
+            </div>
+        </div>
+
+        <!-- Expressions -->
+        <div class="expressions-container" id="expressionsContainer"></div>
+    </div>
+
+    <script>
+        (function() {
+            const MAX_FUNCTIONS = 8;
+            let numVars = 3;
+            let numFuncs = 4;
+            let showHexCol = true;
+            let showSummaryRow = true;
+            let showExpressions = true;
+            let functionNames = [];
+            let functionValues = [];
+            let sectionCollapsed = false;
+            let funcCollapsed = [];
+
+            const numVarsSelect = document.getElementById('numVars');
+            const numFuncsSelect = document.getElementById('numFuncs');
+            const showHexColCheck = document.getElementById('showHexCol');
+            const showSummaryRowCheck = document.getElementById('showSummaryRow');
+            const showExpressionsCheck = document.getElementById('showExpressions');
+            const tableHead = document.getElementById('tableHead');
+            const tableBody = document.getElementById('tableBody');
+            const tableFoot = document.getElementById('tableFoot');
+            const expressionsContainer = document.getElementById('expressionsContainer');
+
+            function initFunctionNames() {
+                functionNames = [];
+                for (let i = 0; i < MAX_FUNCTIONS; i++) functionNames[i] = `F${i + 1}`;
+            }
+
+            function initCollapseState() {
+                funcCollapsed = new Array(MAX_FUNCTIONS).fill(false);
+                sectionCollapsed = false;
+            }
+
+            function initFunctionValues() {
+                const rows = 1 << numVars;
+                functionValues = [];
+                for (let f = 0; f < MAX_FUNCTIONS; f++) functionValues[f] = new Array(rows).fill(0);
+            }
+
+            function getRows() { return 1 << numVars; }
+
+            function getVarNames() { return ['A', 'B', 'C', 'D'].slice(0, numVars); }
+
+            function getVarBits(rowIndex) {
+                const bits = [];
+                for (let v = numVars - 1; v >= 0; v--) bits.push((rowIndex >> v) & 1);
+                return bits;
+            }
+
+            function columnToHex(bits) {
+                const len = bits.length;
+                let value = 0n;
+                for (let i = 0; i < len; i++) if (bits[i]) value |= (1n << BigInt(len - 1 - i));
+                let hexStr = value.toString(16).toUpperCase();
+                while (hexStr.length < Math.ceil(len / 4)) hexStr = '0' + hexStr;
+                return '0x' + hexStr;
+            }
+
+            function computeRowHex(rowIndex) {
+                const N = numFuncs;
+                if (N === 0) return '0x00';
+                const splitHigh = Math.ceil(N / 2);
+                const splitLow = N - splitHigh;
+                let highNibble = 0;
+                for (let i = 0; i < splitHigh; i++) highNibble |= ((functionValues[i]?.[rowIndex] || 0) << (3 - i));
+                let lowNibble = 0;
+                for (let i = 0; i < splitLow; i++) lowNibble |= ((functionValues[splitHigh + i]?.[rowIndex] || 0) << (3 -
+                    i));
+                return '0x' + ((highNibble << 4) | lowNibble).toString(16).toUpperCase().padStart(2, '0');
+            }
+
+            function getMinterms(values) {
+                const m = [];
+                for (let i = 0; i < values.length; i++) if (values[i] === 1) m.push(i);
+                return m;
+            }
+
+            function getMaxterms(values) {
+                const m = [];
+                for (let i = 0; i < values.length; i++) if (values[i] === 0) m.push(i);
+                return m;
+            }
+
+            function countOnes(n, bits) { let c = 0; for (let i = 0; i < bits; i++) if ((n >> i) & 1) c++;
+                return c; }
+
+            function differByOneBit(a, b) { const d = a ^ b; return d !== 0 && (d & (d - 1)) === 0; }
+
+            function combineTerms(a, b, bits) { const d = a ^ b; const mask = ~d & ((1 << bits) - 1); return { term: a &
+                    mask, mask }; }
+
+            function termToString(term, mask, varNames) {
+                const bits = varNames.length;
+                let r = '';
+                for (let i = bits - 1; i >= 0; i--) {
+                    const bp = 1 << i;
+                    if ((mask & bp) === 0) continue;
+                    r += (term & bp) ? varNames[bits - 1 - i] : varNames[bits - 1 - i] + "'";
+                }
+                return r || '1';
+            }
+
+            function mintermToString(m, varNames) {
+                const bits = varNames.length;
+                let r = '';
+                for (let i = bits - 1; i >= 0; i--) r += (m >> i) & 1 ? varNames[bits - 1 - i] : varNames[bits - 1 - i] +
+                    "'";
+                return r;
+            }
+
+            function maxtermToString(m, varNames) {
+                const bits = varNames.length;
+                const p = [];
+                for (let i = bits - 1; i >= 0; i--) p.push((m >> i) & 1 ? varNames[bits - 1 - i] + "'" : varNames[bits - 1 -
+                    i]);
+                return '(' + p.join(' + ') + ')';
+            }
+
+            function simplifyQuineMcCluskey(values, varNames) {
+                const minterms = getMinterms(values);
+                const bits = varNames.length;
+                if (minterms.length === 0) return '0';
+                if (minterms.length === (1 << bits)) return '1';
+                let groups = {};
+                for (const m of minterms) {
+                    const c = countOnes(m, bits);
+                    if (!groups[c]) groups[c] = [];
+                    groups[c].push({ term: m, mask: (1 << bits) - 1, used: false });
+                }
+                let primeImplicants = [],
+                    currentGroups = groups,
+                    changed = true;
+                while (changed) {
+                    changed = false;
+                    let newGroups = {};
+                    const gk = Object.keys(currentGroups).map(Number).sort((a, b) => a - b);
+                    for (let i = 0; i < gk.length - 1; i++) {
+                        if (gk[i + 1] - gk[i] !== 1) continue;
+                        const g1 = currentGroups[gk[i]] || [],
+                            g2 = currentGroups[gk[i + 1]] || [];
+                        for (const a of g1)
+                            for (const b of g2)
+                                if (a.mask === b.mask && differByOneBit(a.term, b.term)) {
+                                    const comb = combineTerms(a.term, b.term, bits);
+                                    const nc = countOnes(comb.term, bits);
+                                    if (!newGroups[nc]) newGroups[nc] = [];
+                                    if (!newGroups[nc].some(t => t.term === comb.term && t.mask === comb.mask)) {
+                                        newGroups[nc].push({ term: comb.term, mask: comb.mask, used: false });
+                                        changed = true;
+                                    }
+                                    a.used = b.used = true;
+                                }
+                    }
+                    for (const k of gk)
+                        for (const t of currentGroups[k]) if (!t.used) primeImplicants.push(t);
+                    currentGroups = newGroups;
+                }
+                for (const k of Object.keys(currentGroups).map(Number))
+                    for (const t of currentGroups[k]) primeImplicants.push(t);
+                const up = [];
+                for (const pi of primeImplicants) if (!up.some(u => u.term === pi.term && u.mask === pi.mask)) up.push(
+                    pi);
+                primeImplicants = up;
+                let uncovered = new Set(minterms),
+                    essential = [];
+                for (const m of minterms) {
+                    const cov = primeImplicants.filter(pi => (m & pi.mask) === (pi.term & pi.mask));
+                    if (cov.length === 1 && !essential.some(e => e.term === cov[0].term && e.mask === cov[0].mask))
+                        essential.push(cov[0]);
+                }
+                for (const pi of essential)
+                    for (const m of minterms)
+                        if ((m & pi.mask) === (pi.term & pi.mask)) uncovered.delete(m);
+                let finalPI = [...essential];
+                if (uncovered.size > 0) {
+                    let remaining = new Set(uncovered);
+                    let available = primeImplicants.filter(pi => !finalPI.some(e => e.term === pi.term && e.mask === pi
+                        .mask));
+                    while (remaining.size > 0 && available.length > 0) {
+                        let best = null,
+                            bc = 0;
+                        for (const pi of available) {
+                            let cover = 0;
+                            for (const m of remaining) if ((m & pi.mask) === (pi.term & pi.mask)) cover++;
+                            if (cover > bc) { bc = cover;
+                                best = pi; }
+                        }
+                        if (best) {
+                            finalPI.push(best);
+                            for (const m of remaining) if ((m & best.mask) === (best.term & best.mask)) remaining
+                                .delete(m);
+                            available = available.filter(pi => !finalPI.some(e => e.term === pi.term && e.mask === pi
+                                .mask));
+                        } else break;
+                    }
+                }
+                if (finalPI.length === 0) finalPI = primeImplicants;
+                return finalPI.map(pi => termToString(pi.term, pi.mask, varNames)).join(' + ');
+            }
+
+            function getCanonicalSOP(values, varNames) {
+                const m = getMinterms(values);
+                if (m.length === 0) return '0';
+                if (m.length === (1 << varNames.length)) return '1';
+                return m.map(x => mintermToString(x, varNames)).join(' + ');
+            }
+
+            function getCanonicalPOS(values, varNames) {
+                const m = getMaxterms(values);
+                if (m.length === 0) return '1';
+                if (m.length === (1 << varNames.length)) return '0';
+                return m.map(x => maxtermToString(x, varNames)).join(' · ');
+            }
+
+            function buildExpressions() {
+                if (!showExpressions) { expressionsContainer.style.display = 'none'; return; }
+                expressionsContainer.style.display = 'flex';
+                const varNames = getVarNames();
+                const aCls = sectionCollapsed ? 'collapsed' : '';
+                const cCls = sectionCollapsed ? 'hidden' : '';
+                let html = `<div class="expr-section-header" id="sectionAccordionHeader">
+              <span class="accordion-arrow ${aCls}">▼</span>
+              <span class="expr-title">Expresiones lógicas</span>
+            </div><div class="expr-content ${cCls}" id="sectionAccordionContent">`;
+                for (let f = 0; f < numFuncs; f++) {
+                    const name = functionNames[f] || `F${f + 1}`;
+                    const vals = functionValues[f] || [];
+                    const sop = getCanonicalSOP(vals, varNames);
+                    const pos = getCanonicalPOS(vals, varNames);
+                    const simp = simplifyQuineMcCluskey(vals, varNames);
+                    const faCls = funcCollapsed[f] ? 'collapsed' : '';
+                    const fbCls = funcCollapsed[f] ? 'hidden' : '';
+                    html += `<div class="expr-card" data-func-index="${f}">
+              <div class="func-header"><span class="func-name">${escapeHTML(name)}</span><span class="func-arrow ${faCls}">▼</span></div>
+              <div class="func-body ${fbCls}">
+                <div class="expr-row"><span class="label">1ª Canónica:</span><span class="value canonical">${escapeHTML(sop)}</span></div>
+                <div class="expr-row"><span class="label">2ª Canónica:</span><span class="value canonical-pos">${escapeHTML(pos)}</span></div>
+                <div class="expr-row"><span class="label">Simplificada:</span><span class="value simplified">${escapeHTML(simp)}</span></div>
+              </div></div>`;
+                }
+                html += '</div>';
+                expressionsContainer.innerHTML = html;
+                attachAccordionEvents();
+            }
+
+            function attachAccordionEvents() {
+                const sh = document.getElementById('sectionAccordionHeader');
+                const sc = document.getElementById('sectionAccordionContent');
+                if (sh) sh.addEventListener('click', function() {
+                    sectionCollapsed = !sectionCollapsed;
+                    sh.querySelector('.accordion-arrow').classList.toggle('collapsed', sectionCollapsed);
+                    sc.classList.toggle('hidden', sectionCollapsed);
+                });
+                document.querySelectorAll('#expressionsContainer .expr-card').forEach(card => {
+                    const fi = parseInt(card.dataset.funcIndex);
+                    const hdr = card.querySelector('.func-header');
+                    const bdy = card.querySelector('.func-body');
+                    const arr = card.querySelector('.func-arrow');
+                    if (hdr) hdr.addEventListener('click', function(e) {
+                        e.stopPropagation();
+                        funcCollapsed[fi] = !funcCollapsed[fi];
+                        arr.classList.toggle('collapsed', funcCollapsed[fi]);
+                        bdy.classList.toggle('hidden', funcCollapsed[fi]);
+                    });
+                });
+            }
+
+            function buildTable() {
+                const rows = getRows();
+                const varNames = getVarNames();
+                let th = '<tr><th class="row-num-header">#</th>';
+                for (const v of varNames) th += `<th class="var-col">${v}</th>`;
+                for (let f = 0; f < numFuncs; f++) th +=
+                    `<th class="func-col"><input type="text" value="${escapeHTML(functionNames[f]||`F${f+1}`)}" data-func-index="${f}" maxlength="12" aria-label="Nombre función ${f+1}"></th>`;
+                if (showHexCol) th += '<th class="hex-col-header">HEX</th>';
+                th += '</tr>';
+                tableHead.innerHTML = th;
+                let tb = '';
+                for (let r = 0; r < rows; r++) {
+                    tb += '<tr>';
+                    tb += `<td class="row-num">${r}</td>`;
+                    for (const bit of getVarBits(r)) tb += `<td class="var-cell">${bit}</td>`;
+                    for (let f = 0; f < numFuncs; f++) {
+                        const val = functionValues[f]?.[r] || 0;
+                        tb +=
+                        `<td class="func-cell val-${val}" data-func="${f}" data-row="${r}" title="Toca para cambiar">${val}</td>`;
+                    }
+                    if (showHexCol) tb += `<td class="hex-cell">${computeRowHex(r)}</td>`;
+                    tb += '</tr>';
+                }
+                tableBody.innerHTML = tb;
+                let tf = '';
+                if (showSummaryRow) {
+                    tf += '<tr><td class="summary-label">Hex</td>';
+                    for (let v = 0; v < numVars; v++) {
+                        const bits = [];
+                        for (let r = 0; r < rows; r++) bits.push(getVarBits(r)[v]);
+                        tf += `<td class="summary-var">${columnToHex(bits)}</td>`;
+                    }
+                    for (let f = 0; f < numFuncs; f++) {
+                        const bits = [];
+                        for (let r = 0; r < rows; r++) bits.push(functionValues[f]?.[r] || 0);
+                        tf += `<td class="summary-func">${columnToHex(bits)}</td>`;
+                    }
+                    if (showHexCol) tf += '<td class="summary-hex">—</td>';
+                    tf += '</tr>';
+                }
+                tableFoot.innerHTML = tf;
+                attachEvents();
+                buildExpressions();
+            }
+
+            function attachEvents() {
+                document.querySelectorAll('#tableHead input[data-func-index]').forEach(inp => {
+                    inp.addEventListener('input', function() {
+                        const i = parseInt(this.dataset.funcIndex);
+                        if (!isNaN(i)) functionNames[i] = this.value || `F${i + 1}`;
+                        buildExpressions();
+                    });
+                    inp.addEventListener('blur', function() {
+                        if (!this.value.trim()) {
+                            const i = parseInt(this.dataset.funcIndex);
+                            this.value = `F${i + 1}`;
+                            functionNames[i] = this.value;
+                        }
+                        buildExpressions();
+                    });
+                });
+                document.querySelectorAll('#tableBody td.func-cell').forEach(cell => {
+                    cell.addEventListener('click', function() {
+                        const fi = parseInt(this.dataset.func);
+                        const ri = parseInt(this.dataset.row);
+                        if (!isNaN(fi) && !isNaN(ri)) {
+                            functionValues[fi][ri] = functionValues[fi][ri] ? 0 : 1;
+                            buildTable();
+                        }
+                    });
+                    cell.addEventListener('touchend', function(e) {
+                        e.preventDefault();
+                        const fi = parseInt(this.dataset.func);
+                        const ri = parseInt(this.dataset.row);
+                        if (!isNaN(fi) && !isNaN(ri)) {
+                            functionValues[fi][ri] = functionValues[fi][ri] ? 0 : 1;
+                            buildTable();
+                        }
+                    });
+                });
+            }
+
+            function escapeHTML(s) { const d = document.createElement('div');
+                d.textContent = s; return d.innerHTML; }
+
+            function onNumVarsChange() {
+                numVars = parseInt(numVarsSelect.value);
+                initFunctionValues();
+                initCollapseState();
+                buildTable();
+            }
+
+            function onNumFuncsChange() { numFuncs = parseInt(numFuncsSelect.value);
+                buildTable(); }
+
+            function onShowHexColChange() { showHexCol = showHexColCheck.checked;
+                buildTable(); }
+
+            function onShowSummaryRowChange() { showSummaryRow = showSummaryRowCheck.checked;
+                buildTable(); }
+
+            function onShowExpressionsChange() {
+                showExpressions = showExpressionsCheck.checked;
+                showExpressions ? buildExpressions() : (expressionsContainer.style.display = 'none');
+            }
+
+            function init() {
+                initFunctionNames();
+                initCollapseState();
+                numVars = parseInt(numVarsSelect.value);
+                numFuncs = parseInt(numFuncsSelect.value);
+                showHexCol = showHexColCheck.checked;
+                showSummaryRow = showSummaryRowCheck.checked;
+                showExpressions = showExpressionsCheck.checked;
+                initFunctionValues();
+                buildTable();
+                numVarsSelect.addEventListener('change', onNumVarsChange);
+                numFuncsSelect.addEventListener('change', onNumFuncsChange);
+                showHexColCheck.addEventListener('change', onShowHexColChange);
+                showSummaryRowCheck.addEventListener('change', onShowSummaryRowChange);
+                showExpressionsCheck.addEventListener('change', onShowExpressionsChange);
+            }
+            init();
+        })();
+    </script>
+</body>
+</html>
