@@ -3,15 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes, viewport-fit=cover">
-	<!-- PWA Meta Tags -->
-	<meta name="description" content="Generador de tablas de verdad con funciones lógicas, simplificación y conversión hexadecimal">
-	<meta name="theme-color" content="#e94560">
-	<meta name="mobile-web-app-capable" content="yes">
-	<meta name="apple-mobile-web-app-capable" content="yes">
-	<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-	<meta name="apple-mobile-web-app-title" content="TdV HEX">
-	<link rel="manifest" href="manifest.json">
-	<link rel="apple-touch-icon" href="icon-192.png">
+        <!-- PWA Meta Tags -->
+        <meta name="description" content="Generador de tablas de verdad con funciones lógicas, simplificación y conversión hexadecimal">
+        <meta name="theme-color" content="#e94560">
+        <meta name="mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+        <meta name="apple-mobile-web-app-title" content="TdV HEX">
+        <link rel="manifest" href="manifest.json">
+        <link rel="apple-touch-icon" href="icon-192.png">
     <title>Tabla de Verdad · Funciones Lógicas</title>
     <style>
         :root {
@@ -769,7 +769,7 @@
             outline-offset: 2px;
             border-radius: 3px;
         }
-		.banner {
+                .banner {
     background: linear-gradient(135deg, var(--accent) 0%, var(--accent2) 100%);
     color: #fff;
     text-align: center;
@@ -910,14 +910,11 @@
             function computeRowHex(rowIndex) {
                 const N = numFuncs;
                 if (N === 0) return '0x00';
-                const splitHigh = Math.ceil(N / 2);
-                const splitLow = N - splitHigh;
-                let highNibble = 0;
-                for (let i = 0; i < splitHigh; i++) highNibble |= ((functionValues[i]?.[rowIndex] || 0) << (3 - i));
-                let lowNibble = 0;
-                for (let i = 0; i < splitLow; i++) lowNibble |= ((functionValues[splitHigh + i]?.[rowIndex] || 0) << (3 -
-                    i));
-                return '0x' + ((highNibble << 4) | lowNibble).toString(16).toUpperCase().padStart(2, '0');
+                let byte = 0;
+                for (let i = 0; i < N; i++) {
+                    byte |= ((functionValues[i]?.[rowIndex] || 0) << (N - 1 - i));
+                }
+                return '0x' + byte.toString(16).toUpperCase().padStart(2, '0');
             }
 
             function getMinterms(values) {
@@ -1241,7 +1238,7 @@
             init();
         })();
     </script>
-	<script>
+        <script>
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
             navigator.serviceWorker.register('./sw.js')
@@ -1249,6 +1246,6 @@
                 .catch((err) => console.log('Error SW:', err));
         });
     }
-	</script>
+        </script>
 </body>
 </html>
