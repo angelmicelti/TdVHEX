@@ -1,4 +1,4 @@
-const CACHE_NAME = 'tdvhex-v1';
+const CACHE_NAME = 'tdvhex-v2';
 const ASSETS = [
   './',
   './index.html',
