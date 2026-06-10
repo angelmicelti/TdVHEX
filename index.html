@@ -3,6 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes, viewport-fit=cover">
+	<!-- PWA Meta Tags -->
+	<meta name="description" content="Generador de tablas de verdad con funciones lógicas, simplificación y conversión hexadecimal">
+	<meta name="theme-color" content="#e94560">
+	<meta name="mobile-web-app-capable" content="yes">
+	<meta name="apple-mobile-web-app-capable" content="yes">
+	<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+	<meta name="apple-mobile-web-app-title" content="TdV HEX">
+	<link rel="manifest" href="manifest.json">
+	<link rel="apple-touch-icon" href="icon-192.png">
     <title>Tabla de Verdad · Funciones Lógicas</title>
     <style>
         :root {
@@ -760,6 +769,18 @@
             outline-offset: 2px;
             border-radius: 3px;
         }
+		.banner {
+    background: linear-gradient(135deg, var(--accent) 0%, var(--accent2) 100%);
+    color: #fff;
+    text-align: center;
+    padding: clamp(10px, 2vw, 16px) clamp(12px, 2.5vw, 24px);
+    border-radius: var(--radius);
+    font-size: var(--font-lg);
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    box-shadow: var(--shadow);
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
     </style>
 </head>
 <body>
@@ -1220,5 +1241,14 @@
             init();
         })();
     </script>
+	<script>
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('./sw.js')
+                .then((reg) => console.log('SW registrado:', reg.scope))
+                .catch((err) => console.log('Error SW:', err));
+        });
+    }
+	</script>
 </body>
 </html>
